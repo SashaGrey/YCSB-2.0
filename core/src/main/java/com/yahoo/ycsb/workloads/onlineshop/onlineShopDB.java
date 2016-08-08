@@ -15,13 +15,16 @@
  * LICENSE file.
  */
 
-package com.yahoo.ycsb;
+package com.yahoo.ycsb.workloads.onlineshop;
+
+import com.yahoo.ycsb.DB;
+import com.yahoo.ycsb.Status;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-public abstract class onlineShopDB extends DB {
+public abstract class OnlineShopDB extends DB {
 
 
 
@@ -43,7 +46,7 @@ public abstract class onlineShopDB extends DB {
   public abstract Status getLatestRecommendations(int bookID, int limit);
 
 
-  public abstract Status getAllRecommendations(int bookID);
+  public abstract Recommendation getAllRecommendations(int bookID);
 
 
   public abstract Status getUsersRecommendations(int userID);

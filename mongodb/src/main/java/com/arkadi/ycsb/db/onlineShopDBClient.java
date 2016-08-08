@@ -9,16 +9,17 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.InsertManyOptions;
 import com.mongodb.client.result.UpdateResult;
 import com.yahoo.ycsb.ByteIterator;
+import com.yahoo.ycsb.workloads.onlineshop.Recommendation;
 import com.yahoo.ycsb.Status;
 import com.yahoo.ycsb.db.OptionsSupport;
-import com.yahoo.ycsb.onlineShopDB;
+import com.yahoo.ycsb.workloads.onlineshop.OnlineShopDB;
 import org.bson.Document;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
-public class onlineShopDBClient extends onlineShopDB {
+public class OnlineShopDBClient extends OnlineShopDB {
 
 
   protected static final Integer INCLUDE = 1;
@@ -252,11 +253,11 @@ public class onlineShopDBClient extends onlineShopDB {
    * db.recommendations.find({_id: recommendationBundleID}).first()
    */
   @Override
-  public Status getAllRecommendations(int bookID) {
+  public Recommendation getAllRecommendations(int bookID) {
     Document query = new Document("_id", bookID);
-    database.getCollection("recommendations").find(query).first();
-
-    return Status.OK;
+    Document recommDoc = database.getCollection("recommendations").find(query).first();
+    Recommendation rec = new Recommendation(Status.OK.getName(), Status.OK.getDescription(), 5);
+    return rec;
   }
 
   /**

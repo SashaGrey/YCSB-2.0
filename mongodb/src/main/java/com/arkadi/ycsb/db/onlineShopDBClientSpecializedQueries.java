@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 
-public class onlineShopDBClientSpecializedQueries extends onlineShopDBClient {
+public class OnlineShopDBClientSpecializedQueries extends OnlineShopDBClient {
 
 
   /**

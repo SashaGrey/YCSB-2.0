@@ -15,8 +15,11 @@
  * LICENSE file.
  */
 
-package com.yahoo.ycsb;
+package com.yahoo.ycsb.workloads.onlineshop;
 
+import com.yahoo.ycsb.ByteIterator;
+import com.yahoo.ycsb.DBException;
+import com.yahoo.ycsb.Status;
 import com.yahoo.ycsb.measurements.Measurements;
 import org.apache.htrace.core.TraceScope;
 import org.apache.htrace.core.Tracer;
@@ -27,11 +30,11 @@ import java.util.*;
  * Wrapper around a "real" DB that measures latencies and counts return codes.
  * Also reports latency separately between OK and failed operations.
  */
-public class onlineShopDBWrapper extends onlineShopDB {
+public class OnlineShopDBWrapper extends OnlineShopDB {
   private static final String REPORT_LATENCY_FOR_EACH_ERROR_PROPERTY = "reportlatencyforeacherror";
   private static final String REPORT_LATENCY_FOR_EACH_ERROR_PROPERTY_DEFAULT = "false";
   private static final String LATENCY_TRACKED_ERRORS_PROPERTY = "latencytrackederrors";
-  private final onlineShopDB _db;
+  private final OnlineShopDB _db;
   private final Measurements _measurements;
 
 
@@ -59,7 +62,7 @@ public class onlineShopDBWrapper extends onlineShopDB {
   private boolean reportLatencyForEachError = false;
   private HashSet<String> latencyTrackedErrors = new HashSet<String>();
 
-  public onlineShopDBWrapper(final onlineShopDB db, final Tracer tracer) {
+  public OnlineShopDBWrapper(final OnlineShopDB db, final Tracer tracer) {
     _db = db;
     _measurements = Measurements.getMeasurements();
     _tracer = tracer;
@@ -126,7 +129,7 @@ public class onlineShopDBWrapper extends onlineShopDB {
 
   private void measure(String op, Status result, long intendedStartTimeNanos, long startTimeNanos, long endTimeNanos) {
     String measurementName = op;
-    if (result != Status.OK) {
+    if (!result.getName().equals(Status.OK.getName())) {
       if (this.reportLatencyForEachError ||
         this.latencyTrackedErrors.contains(result.getName())) {
         measurementName = op + "-" + result.getName();
@@ -219,12 +222,12 @@ public class onlineShopDBWrapper extends onlineShopDB {
   }
 
   @Override
-  public Status getAllRecommendations(int bookID) {
+  public Recommendation getAllRecommendations(int bookID) {
     {
       try (final TraceScope span = _tracer.newScope(SCOPE_STRING_GET_ALL_RECOMMENDATION)) {
         long ist = _measurements.getIntendedtartTimeNs();
         long st = System.nanoTime();
-        Status res = _db.getAllRecommendations(bookID);
+        Recommendation res = _db.getAllRecommendations(bookID);
         long en = System.nanoTime();
         measure("getAllRecommendations", res, ist, st, en);
         _measurements.reportStatus("getAllRecommendations", res);
