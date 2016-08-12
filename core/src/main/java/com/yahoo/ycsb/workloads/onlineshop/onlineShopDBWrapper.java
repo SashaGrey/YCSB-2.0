@@ -30,11 +30,11 @@ import java.util.*;
  * Wrapper around a "real" DB that measures latencies and counts return codes.
  * Also reports latency separately between OK and failed operations.
  */
-public class OnlineShopDBWrapper extends OnlineShopDB {
+public class onlineShopDBWrapper extends onlineShopDB {
   private static final String REPORT_LATENCY_FOR_EACH_ERROR_PROPERTY = "reportlatencyforeacherror";
   private static final String REPORT_LATENCY_FOR_EACH_ERROR_PROPERTY_DEFAULT = "false";
   private static final String LATENCY_TRACKED_ERRORS_PROPERTY = "latencytrackederrors";
-  private final OnlineShopDB _db;
+  private final onlineShopDB _db;
   private final Measurements _measurements;
 
 
@@ -60,9 +60,9 @@ public class OnlineShopDBWrapper extends OnlineShopDB {
   private final String SCOPE_STRING_INIT;
 
   private boolean reportLatencyForEachError = false;
-  private HashSet<String> latencyTrackedErrors = new HashSet<String>();
+  private HashSet<String> latencyTrackedErrors = new HashSet<>();
 
-  public OnlineShopDBWrapper(final OnlineShopDB db, final Tracer tracer) {
+  public onlineShopDBWrapper(final onlineShopDB db, final Tracer tracer) {
     _db = db;
     _measurements = Measurements.getMeasurements();
     _tracer = tracer;
@@ -207,12 +207,12 @@ public class OnlineShopDBWrapper extends OnlineShopDB {
   }
 
   @Override
-  public Status getLatestRecommendations(int bookID, int limit) {
+  public Recommendation getLatestRecommendations(int bookID, int limit) {
     {
       try (final TraceScope span = _tracer.newScope(SCOPE_STRING_GET_LATEST_RECOMMENDATION)) {
         long ist = _measurements.getIntendedtartTimeNs();
         long st = System.nanoTime();
-        Status res = _db.getLatestRecommendations(bookID, limit);
+        Recommendation res = _db.getLatestRecommendations(bookID, limit);
         long en = System.nanoTime();
         measure("getLatestRecommendations", res, ist, st, en);
         _measurements.reportStatus("getLatestRecommendations", res);
@@ -237,12 +237,12 @@ public class OnlineShopDBWrapper extends OnlineShopDB {
   }
 
   @Override
-  public Status getUsersRecommendations(int userID) {
+  public Recommendation getUsersRecommendations(int userID) {
     {
       try (final TraceScope span = _tracer.newScope(SCOPE_STRING_GET_USERS_RECOMMENDATION)) {
         long ist = _measurements.getIntendedtartTimeNs();
         long st = System.nanoTime();
-        Status res = _db.getUsersRecommendations(userID);
+        Recommendation res = _db.getUsersRecommendations(userID);
         long en = System.nanoTime();
         measure("getUsersRecommendations", res, ist, st, en);
         _measurements.reportStatus("getUsersRecommendations", res);
@@ -252,12 +252,12 @@ public class OnlineShopDBWrapper extends OnlineShopDB {
   }
 
   @Override
-  public Status getAuthorByID(int authorID) {
+  public Author getAuthorByID(int authorID) {
     {
       try (final TraceScope span = _tracer.newScope(SCOPE_STRING_GET_AUTHOR_BY_ID)) {
         long ist = _measurements.getIntendedtartTimeNs();
         long st = System.nanoTime();
-        Status res = _db.getAuthorByID(authorID);
+        Author res = _db.getAuthorByID(authorID);
         long en = System.nanoTime();
         measure("getAuthorByID", res, ist, st, en);
         _measurements.reportStatus("getAuthorByID", res);
@@ -267,12 +267,12 @@ public class OnlineShopDBWrapper extends OnlineShopDB {
   }
 
   @Override
-  public Status findBooksByGenre(String genreList, int limit) {
+  public Book findBooksByGenre(String genreList, int limit) {
     {
       try (final TraceScope span = _tracer.newScope(SCOPE_STRING_GET_BOOKS_BY_GENRE)) {
         long ist = _measurements.getIntendedtartTimeNs();
         long st = System.nanoTime();
-        Status res = _db.findBooksByGenre(genreList, limit);
+        Book res = _db.findBooksByGenre(genreList, limit);
         long en = System.nanoTime();
         measure("findBooksByGenre", res, ist, st, en);
         _measurements.reportStatus("findBooksByGenre", res);
@@ -282,12 +282,12 @@ public class OnlineShopDBWrapper extends OnlineShopDB {
   }
 
   @Override
-  public Status findBooksName(String bookName, int limit) {
+  public Book findBookByName(String bookName) {
     {
       try (final TraceScope span = _tracer.newScope(SCOPE_STRING_FIND_BOOKS_NAME)) {
         long ist = _measurements.getIntendedtartTimeNs();
         long st = System.nanoTime();
-        Status res = _db.findBooksName(bookName, limit);
+        Book res = _db.findBookByName(bookName);
         long en = System.nanoTime();
         measure("findBooksName", res, ist, st, en);
         _measurements.reportStatus("findBooksName", res);
@@ -297,12 +297,12 @@ public class OnlineShopDBWrapper extends OnlineShopDB {
   }
 
   @Override
-  public Status findAuthorByBookID(int bookID) {
+  public Author findAuthorByBookID(int bookID) {
     {
       try (final TraceScope span = _tracer.newScope(SCOPE_STRING_FIND_AUTHOR_BY_BOOK)) {
         long ist = _measurements.getIntendedtartTimeNs();
         long st = System.nanoTime();
-        Status res = _db.findAuthorByBookID(bookID);
+        Author res = _db.findAuthorByBookID(bookID);
         long en = System.nanoTime();
         measure("findAuthorByBookID", res, ist, st, en);
         _measurements.reportStatus("findAuthorByBookID", res);

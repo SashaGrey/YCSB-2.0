@@ -10,10 +10,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 
-public class OnlineShopDBClientSpecializedQueries extends OnlineShopDBClient {
+public class onlineShopDBClientSpecializedQueries extends onlineShopDBClient {
 
-
-  /**
+/*
+  *//**
    * db.colR.aggregate([{"$match":{"_id": recommendationBundleID }},
    * {"$unwind": "$recommendations"},
    * {"$match": {"recommendations.likes": {"$gt":recRating}}},
@@ -21,7 +21,7 @@ public class OnlineShopDBClientSpecializedQueries extends OnlineShopDBClient {
    * {"$sort": {"recommendations.likes":1}},
    * {"$limit": 20}
    * ])
-   */
+   *//*
   public Status findRecommendationsByRating(int bookID, double recRating) {
     Bson queryDoc = new Document("$match", new Document("_id", bookID));
     Bson queryEmbedDoc = new Document("$match", new Document("recommendations.likes", new Document("$gt", recRating)));
@@ -37,10 +37,10 @@ public class OnlineShopDBClientSpecializedQueries extends OnlineShopDBClient {
     return Status.OK;
   }
 
-  /**
+  *//**
    * db.books.ensureIndex({introduction:"text"})
    * db.books.find({$text:{$search:searchText}})
-   */
+   *//*
   public Status findBooksByTextMatch(String searchText) {
     database.getCollection("books").createIndex(new Document("introduction", "text"));
     database.getCollection("books").find(new Document("$text", new Document("$search", searchText)));
@@ -49,9 +49,9 @@ public class OnlineShopDBClientSpecializedQueries extends OnlineShopDBClient {
   }
 
 
-  /**
+  *//**
    * db.authors.find({fullName: authorName,booksPublished:{$exists:true},booksPublished: {$size:{$gt:3}}})
-   */
+   *//*
   public Status findHDAuthor(String authorName, int bookWritten) {
     FindIterable<Document> results = database.getCollection("authors")
       .find(new Document("fullName", authorName)
@@ -59,5 +59,5 @@ public class OnlineShopDBClientSpecializedQueries extends OnlineShopDBClient {
         .append("booksPublished", new Document("$size", new Document("$gt", 3))));
 
     return Status.OK;
-  }
+  }*/
 }

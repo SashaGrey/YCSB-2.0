@@ -9,31 +9,35 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.InsertManyOptions;
 import com.mongodb.client.result.UpdateResult;
 import com.yahoo.ycsb.ByteIterator;
+import com.yahoo.ycsb.workloads.onlineshop.Author;
+import com.yahoo.ycsb.workloads.onlineshop.Book;
 import com.yahoo.ycsb.workloads.onlineshop.Recommendation;
 import com.yahoo.ycsb.Status;
 import com.yahoo.ycsb.db.OptionsSupport;
-import com.yahoo.ycsb.workloads.onlineshop.OnlineShopDB;
+import com.yahoo.ycsb.workloads.onlineshop.onlineShopDB;
 import org.bson.Document;
+import com.mongodb.client.FindIterable;
+import com.mongodb.Block;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
-public class OnlineShopDBClient extends OnlineShopDB {
+public class onlineShopDBClient extends onlineShopDB {
 
 
-  protected static final Integer INCLUDE = 1;
-  protected static final InsertManyOptions INSERT_UNORDERED = new InsertManyOptions().ordered(false);
-  protected static final AtomicInteger INIT_COUNT = new AtomicInteger(0);
-  protected static String databaseName;
-  protected static MongoDatabase database;
-  protected static MongoClient mongoClient;
-  protected static ReadPreference readPreference;
-  protected static WriteConcern writeConcern;
-  protected static int batchSize;
-  protected static boolean useUpsert;
-  protected List<Document> BULKINSERT_B = new ArrayList<>();
-  protected List<Document> BULKINSERT_A = new ArrayList<>();
+  private static final Integer INCLUDE = 1;
+  private static final InsertManyOptions INSERT_UNORDERED = new InsertManyOptions().ordered(false);
+  private static final AtomicInteger INIT_COUNT = new AtomicInteger(0);
+  private static String databaseName;
+  private static MongoDatabase database;
+  private static MongoClient mongoClient;
+  private static ReadPreference readPreference;
+  private static WriteConcern writeConcern;
+  private static int batchSize;
+  private static boolean useUpsert;
+  private List<Document> BULKINSERT_B = new ArrayList<>();
+  private List<Document> BULKINSERT_A = new ArrayList<>();
 
 
   public void init() {
@@ -241,12 +245,25 @@ public class OnlineShopDBClient extends OnlineShopDB {
    * db.recommendations.find({"_id":recommendationBundleID}).sort({"recommendations._id",-1}).limit(amount)
    */
   @Override
-  public Status getLatestRecommendations(int bookID, int limit) {
+  public Recommendation getLatestRecommendations(int bookID, int limit) {
     Document query = new Document("_id", bookID);
     Document sortKrit = new Document("recommends._id", -1);
-    database.getCollection("recommendations").find(query).sort(sortKrit).limit(limit);
+    FindIterable<Document> result = database.getCollection("recommendations").find(query).sort(sortKrit).limit(limit);
 
-    return Status.OK;
+    final ArrayList<Integer> stars = new ArrayList<>();
+    result.forEach(new Block<Document>() {
+      @Override
+      public void apply(final Document document) {
+        stars.add(document.getInteger("stars"));
+      }
+    });
+
+    int evStars = 0;
+    for (Integer i : stars) {
+      evStars = evStars + i;
+    }
+
+    return new Recommendation(Status.OK.getName(), Status.OK.getDescription(), bookID,evStars/limit);
   }
 
   /**
@@ -256,29 +273,40 @@ public class OnlineShopDBClient extends OnlineShopDB {
   public Recommendation getAllRecommendations(int bookID) {
     Document query = new Document("_id", bookID);
     Document recommDoc = database.getCollection("recommendations").find(query).first();
-    Recommendation rec = new Recommendation(Status.OK.getName(), Status.OK.getDescription(), 5);
-    return rec;
+
+    return new Recommendation(Status.OK.getName(), Status.OK.getDescription(), (String) recommDoc.get("bookTitle"), (int) recommDoc.get("recommendCount"));
+
   }
 
   /**
    * db.authors.find({_id:authorID}).first()
    */
   @Override
-  public Status getAuthorByID(int authorID) {
+  public Author getAuthorByID(int authorID) {
     Document query = new Document("_id", authorID);
-    database.getCollection("authors").find(query).first();
-    return Status.OK;
+    Document result = database.getCollection("authors").find(query).first();
+
+    return new Author(Status.OK.getName(), Status.OK.getDescription(), result.getString("fullName"), result.getString("gender"), result.getString("resume"));
   }
 
   /**
    * db.books.find({genres:{ $all: [genreList[0],genreList[n]]}}).limit(max)
    */
   @Override
-  public Status findBooksByGenre(String genreList, int limit) {
+  public Book findBooksByGenre(String genreList, int limit) {
     String[] genres = genreList.split(",");
     Document query = new Document("genre", new Document("$all", genres));
-    database.getCollection("books").find(query).limit(limit);
-    return Status.OK;
+    FindIterable<Document> result = database.getCollection("books").find(query).limit(limit);
+
+    final HashSet books = new HashSet();
+    result.forEach(new Block<Document>() {
+      @Override
+      public void apply(final Document document) {
+        books.add(document.getString("title"));
+      }
+    });
+
+    return new Book(Status.OK.getName(), Status.OK.getDescription(), books);
   }
 
 
@@ -286,30 +314,36 @@ public class OnlineShopDBClient extends OnlineShopDB {
    * db.users.find({_id: userID},{booksRecommended: 1})
    */
   @Override
-  public Status getUsersRecommendations(int userID) {
+  public Recommendation getUsersRecommendations(int userID) {
     Document query = new Document("_id", userID);
     Document booksID = database.getCollection("users").find(query).first();
     int[] booksIDs = (int[]) booksID.get("booksRecommended");
     final List<Document> userRecommends = new LinkedList<>();
 
-    if (booksIDs != null) {
+    // mindestens ein buch wurde kommentiert
+    Recommendation rec = new Recommendation(Status.OK.getName(), Status.OK.getDescription(), booksIDs[0],1);
+
+    if (booksIDs.length != 0) {
       for (int book : booksIDs) {
         userRecommends.add(database.getCollection("recommendations").find(new Document("_id", book).append("recommends.userID", userID)).first());
       }
-      return Status.OK;
+
+
+      return rec;
     }
-    return Status.OK;
+    return rec;
   }
 
   /*----------------------------------------------find operations ----------------------------------------------------*/
 
   /**
-   * db.books.find({"name": bName}.limit(max)
+   * db.books.find({"name": bName}.first()
    */
   @Override
-  public Status findBooksName(String bookName, int limit) {
-    database.getCollection("books").find(new Document("name", bookName)).limit(limit);
-    return Status.OK;
+  public Book findBookByName(String bookName) {
+    Document result = database.getCollection("books").find(new Document("name", bookName)).first();
+
+    return new Book(Status.OK.getName(), Status.OK.getDescription(), result.getString("title"), result.getString("introductionText"), result.getString("language"));
   }
 
   /**
@@ -317,12 +351,15 @@ public class OnlineShopDBClient extends OnlineShopDB {
    * db.authors.find(Resultauthor)
    */
   @Override
-  public Status findAuthorByBookID(int bookID) {
+  public Author findAuthorByBookID(int bookID) {
     Document query = new Document("_id", bookID);
     Document projection = new Document("author", 1).append("_id", 0);
     Document resultAuthor = (Document) database.getCollection("books").find(query).projection(projection);
-    database.getCollection("authors").find(resultAuthor).first();
-    return Status.OK;
+    Document result = database.getCollection("authors").find(resultAuthor).first();
+
+    return new Author(Status.OK.getName(), Status.OK.getDescription(), result.getString("fullName"), result.getString("gender"), result.getString("resume"));
+
+
 
   }
 /*----------------------------------------------update operations --------------------------------------------------*/
@@ -402,13 +439,13 @@ public class OnlineShopDBClient extends OnlineShopDB {
    * db.authors.updateOne({_id: _authorID,},{$pull:{bookPublished:{_id: bookID}})
    */
 
-  public Status deleteBookReferenceFromAuthorList(int bookID) {
+  private Status deleteBookReferenceFromAuthorList(int bookID) {
     Document query = new Document("_id", bookID);
     Document project = new Document("authors._id", 1).append("_id", 0);
     Document authors = database.getCollection("books").find(query).projection(project).first();
 
     Document update = new Document("$pull", new Document("bookPublished", new Document("_id", bookID)));
-    UpdateResult result = database.getCollection("authors").updateMany(query, update);
+    database.getCollection("authors").updateMany(query, update);
 
     return Status.OK;
   }

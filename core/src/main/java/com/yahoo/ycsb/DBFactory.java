@@ -19,16 +19,16 @@ package com.yahoo.ycsb;
 
 import java.util.Properties;
 
-import com.yahoo.ycsb.workloads.onlineshop.OnlineShopDB;
-import com.yahoo.ycsb.workloads.onlineshop.OnlineShopDBWrapper;
+import com.yahoo.ycsb.workloads.onlineshop.onlineShopDB;
+import com.yahoo.ycsb.workloads.onlineshop.onlineShopDBWrapper;
 import org.apache.htrace.core.Tracer;
 
 /**
  * Creates a DB layer by dynamically classloading the specified DB class.
  */
-public class DBFactory {
+ class DBFactory {
   @SuppressWarnings("unchecked")
-  public static DB newDB(String dbname, Properties properties, final Tracer tracer) throws UnknownDBException {
+   static DB newDB(String dbname, Properties properties, final Tracer tracer) throws UnknownDBException {
     ClassLoader classLoader = DBFactory.class.getClassLoader();
 
     DB ret = null;
@@ -45,7 +45,7 @@ public class DBFactory {
 
     ret.setProperties(properties);
     if (dbname.contains("OnlineShopDBClient")) {
-      return new OnlineShopDBWrapper((OnlineShopDB) ret, tracer);
+      return new onlineShopDBWrapper ((onlineShopDB) ret, tracer);
     } else {
       return new DBWrapper(ret, tracer);
     }

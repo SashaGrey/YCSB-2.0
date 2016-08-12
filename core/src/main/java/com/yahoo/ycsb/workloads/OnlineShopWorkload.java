@@ -20,7 +20,7 @@ package com.yahoo.ycsb.workloads;
 import com.yahoo.ycsb.*;
 import com.yahoo.ycsb.generator.*;
 import com.yahoo.ycsb.measurements.Measurements;
-import com.yahoo.ycsb.workloads.onlineshop.OnlineShopDB;
+import com.yahoo.ycsb.workloads.onlineshop.onlineShopDB;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -31,20 +31,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class OnlineShopWorkload extends Workload {
 
   /*ID generators */
-  NumberGenerator authorIDgenerator;
-  NumberGenerator bookIDgenerator;
-  NumberGenerator userIDgenerator;
+  private NumberGenerator authorIDgenerator;
+  private NumberGenerator bookIDgenerator;
+  private NumberGenerator userIDgenerator;
 
 
   /* STRING generators */
-  IncrementingPrintableStringGenerator text;
+  private IncrementingPrintableStringGenerator text;
 
 
   /* PICK from fixed set generators */
-  DiscreteGenerator language;
-  DiscreteGenerator gender;
-  DiscreteGenerator genres;
-  DiscreteGenerator operationchooser;
+  private DiscreteGenerator language;
+  private DiscreteGenerator gender;
+  private  DiscreteGenerator genres;
+  private  DiscreteGenerator operationchooser;
 
 
   /* load phase */
@@ -56,36 +56,36 @@ public class OnlineShopWorkload extends Workload {
   private int authorCount;
   private int recCount;
 
-  NumberGenerator authorIDchooser;
-  NumberGenerator bookIDchooser;
-  NumberGenerator userIDchooser;
-  AtomicInteger recCounter;
-  NumberGenerator LoadauthorIDchooser;
-  NumberGenerator LoadbookIDchooser;
-  NumberGenerator LoaduserIDchooser;
+  private  NumberGenerator authorIDchooser;
+  private NumberGenerator bookIDchooser;
+  private  NumberGenerator userIDchooser;
+  private  AtomicInteger recCounter;
+  private NumberGenerator LoadauthorIDchooser;
+  private NumberGenerator LoadbookIDchooser;
+  private NumberGenerator LoaduserIDchooser;
 
 
   /* transaction phase */
-  int insertAuthorStart;
-  int insertAuthorCount;
-  int insertBookStart;
-  int insertBookCount;
-  int insertUserStart;
-  int insertUserCount;
+  private int insertAuthorStart;
+  private  int insertAuthorCount;
+  private  int insertBookStart;
+  private  int insertBookCount;
+  private  int insertUserStart;
+  private  int insertUserCount;
 
-  String requestdistrib;
-  Boolean dotransactions;
+  private  String requestdistrib;
+  private  Boolean dotransactions;
 
-  AcknowledgedCounterGenerator transactioninsertkeysequenceUser;
-  AcknowledgedCounterGenerator transactioninsertkeysequenceBook;
-  AcknowledgedCounterGenerator transactioninsertkeysequenceAuthor;
+  private AcknowledgedCounterGenerator transactioninsertkeysequenceUser;
+  private AcknowledgedCounterGenerator transactioninsertkeysequenceBook;
+  private  AcknowledgedCounterGenerator transactioninsertkeysequenceAuthor;
 
 
-  boolean orderedinserts;
+  private  boolean orderedinserts;
   private Measurements _measurements = Measurements.getMeasurements();
 
   /* Text property */
-  public static final int TEXT_LENGTH_PROPERTY = 50;
+  private  static final int TEXT_LENGTH_PROPERTY = 50;
 
 
   /*----------- The default field length distribution."uniform", "zipfian","constant" and "histogram -----------------*/
@@ -144,7 +144,7 @@ public class OnlineShopWorkload extends Workload {
   private static final String HOTSPOT_OPN_FRACTION = "hotspotopnfraction";
   private static final String HOTSPOT_OPN_FRACTION_DEFAULT = "0.8";
 
-  private OnlineShopDB db;
+  private onlineShopDB db;
   private Object threadstate;
 
 
@@ -286,55 +286,55 @@ public class OnlineShopWorkload extends Workload {
   public boolean doTransaction(DB db, Object threadstate) {
     switch (operationchooser.nextString()) {
       case "insertUser":
-        doTransaction_InsertUser((OnlineShopDB) db);
+        doTransaction_InsertUser((onlineShopDB) db);
         break;
       case "insertAuthor":
-        doTransaction_InsertAuthor((OnlineShopDB) db);
+        doTransaction_InsertAuthor((onlineShopDB) db);
         break;
       case "insertBook":
-        doTransaction_InsertBook((OnlineShopDB) db);
+        doTransaction_InsertBook((onlineShopDB) db);
         break;
       case "insertRecommendation":
-        doTransaction_InsertRecommendation((OnlineShopDB) db);
+        doTransaction_InsertRecommendation((onlineShopDB) db);
         break;
       case "getLatestRecommendations":
-        doTransaction_GetLatestRecommendations((OnlineShopDB) db);
+        doTransaction_GetLatestRecommendations((onlineShopDB) db);
         break;
       case "getAllRecommendations":
-        doTransaction_GetAllRecommendations((OnlineShopDB) db);
+        doTransaction_GetAllRecommendations((onlineShopDB) db);
         break;
       case "getUsersRecommendations":
-        doTransaction_GetUsersRecommendations((OnlineShopDB) db);
+        doTransaction_GetUsersRecommendations((onlineShopDB) db);
         break;
       case "getAuthorByID":
-        doTransaction_GetAuthorByID((OnlineShopDB) db);
+        doTransaction_GetAuthorByID((onlineShopDB) db);
         break;
       case "getAuthorByBookID":
-        doTransaction_GetAuthorByBookID((OnlineShopDB) db);
+        doTransaction_GetAuthorByBookID((onlineShopDB) db);
         break;
       case "findBooksByGenre":
-        doTransaction_FindBooksByGenre((OnlineShopDB) db);
+        doTransaction_FindBooksByGenre((onlineShopDB) db);
         break;
       case "findBooksName":
-        doTransaction_FindBooksName((OnlineShopDB) db);
+        doTransaction_FindBooksName((onlineShopDB) db);
         break;
       case "updateAuthor":
-        doTransaction_UpdateAuthor((OnlineShopDB) db);
+        doTransaction_UpdateAuthor((onlineShopDB) db);
         break;
       case "updateBook":
-        doTransaction_UpdateBook((OnlineShopDB) db);
+        doTransaction_UpdateBook((onlineShopDB) db);
         break;
       case "updateRecommendation":
-        doTransaction_UpdateRecommendation((OnlineShopDB) db);
+        doTransaction_UpdateRecommendation((onlineShopDB) db);
         break;
       case "deleteBook":
-        doTransaction_DeleteBook((OnlineShopDB) db);
+        doTransaction_DeleteBook((onlineShopDB) db);
         break;
       case "deleteAllRecommendationsBelongToBook":
-        doTransaction_DeleteAllRecommendationsBelongToBook((OnlineShopDB) db);
+        doTransaction_DeleteAllRecommendationsBelongToBook((onlineShopDB) db);
         break;
       case "deleteAuthor":
-        doTransaction_DeleteAuthor((OnlineShopDB) db);
+        doTransaction_DeleteAuthor((onlineShopDB) db);
         break;
     }
     return true;
@@ -355,22 +355,22 @@ public class OnlineShopWorkload extends Workload {
     int recID;
 
     do {
-      doTransaction_InsertAuthor((OnlineShopDB) db);
+      doTransaction_InsertAuthor((onlineShopDB) db);
       authorID = authorIDgenerator.lastValue().intValue();
     } while (authorID < authorCount);
 
     do {
-      doTransaction_InsertBook((OnlineShopDB) db);
+      doTransaction_InsertBook((onlineShopDB) db);
       bookID = bookIDgenerator.lastValue().intValue();
     } while (bookID < bookCount);
 
     do {
-      doTransaction_InsertUser((OnlineShopDB) db);
+      doTransaction_InsertUser((onlineShopDB) db);
       userID = userIDgenerator.lastValue().intValue();
     } while (userID < userCount);
 
     do {
-      doTransaction_InsertRecommendation((OnlineShopDB) db);
+      doTransaction_InsertRecommendation((onlineShopDB) db);
       recID = recCounter.getAndIncrement();
     } while (recID < recCount);
 
@@ -379,7 +379,7 @@ public class OnlineShopWorkload extends Workload {
   }
 
 
-  public void doTransaction_InsertAuthor(OnlineShopDB db) {
+  private void doTransaction_InsertAuthor(onlineShopDB db) {
     int authorID;
 
     if (dotransactions) {
@@ -399,7 +399,7 @@ public class OnlineShopWorkload extends Workload {
   }
 
 
-  public void doTransaction_InsertBook(OnlineShopDB db) {
+  public void doTransaction_InsertBook(onlineShopDB db) {
     int bookID;
     NumberGenerator chooser;
 
@@ -444,7 +444,7 @@ public class OnlineShopWorkload extends Workload {
     }
   }
 
-  public void doTransaction_InsertUser(OnlineShopDB db) {
+  public void doTransaction_InsertUser(onlineShopDB db) {
     int userID;
     if (dotransactions) {
       userID = transactioninsertkeysequenceUser.nextValue();
@@ -461,7 +461,7 @@ public class OnlineShopWorkload extends Workload {
 
   }
 
-  public void doTransaction_InsertRecommendation(OnlineShopDB db) {
+  public void doTransaction_InsertRecommendation(onlineShopDB db) {
     int userID;
     int bookID;
     if (dotransactions) {
@@ -483,46 +483,46 @@ public class OnlineShopWorkload extends Workload {
     }
   }
 
-  private void doTransaction_GetLatestRecommendations(OnlineShopDB db) {
+  private void doTransaction_GetLatestRecommendations(onlineShopDB db) {
     int bookID = nextKeynum(bookIDchooser, transactioninsertkeysequenceBook.lastValue().intValue());
     Random random = new Random();
     int latestCount = random.nextInt(10 - 1 + 1) + 1;
     db.getLatestRecommendations(bookID, latestCount);
   }
 
-  private void doTransaction_GetAllRecommendations(OnlineShopDB db) {
+  private void doTransaction_GetAllRecommendations(onlineShopDB db) {
     int bookID = nextKeynum(bookIDchooser, transactioninsertkeysequenceBook.lastValue().intValue());
     db.getAllRecommendations(bookID);
   }
 
-  private void doTransaction_GetUsersRecommendations(OnlineShopDB db) {
+  private void doTransaction_GetUsersRecommendations(onlineShopDB db) {
     int userID = nextKeynum(userIDchooser, transactioninsertkeysequenceUser.lastValue().intValue());
     db.getUsersRecommendations(userID);
   }
 
-  private Status doTransaction_GetAuthorByID(OnlineShopDB db) {
+  private Status doTransaction_GetAuthorByID(onlineShopDB db) {
     int authorID = nextKeynum(authorIDchooser, transactioninsertkeysequenceAuthor.lastValue().intValue());
     return db.getAuthorByID(authorID);
 
   }
 
-  private Status doTransaction_GetAuthorByBookID(OnlineShopDB db) {
+  private Status doTransaction_GetAuthorByBookID(onlineShopDB db) {
     int bookID = nextKeynum(bookIDchooser, transactioninsertkeysequenceBook.lastValue().intValue());
     return db.getAuthorByID(bookID);
   }
 
-  private void doTransaction_FindBooksName(OnlineShopDB db) {
+  private void doTransaction_FindBooksName(onlineShopDB db) {
     int bookID = nextKeynum(bookIDchooser, transactioninsertkeysequenceBook.lastValue().intValue());
     String bookName1 = buildKeyName("book", bookID);
-    db.findBooksName(bookName1, 5);
+    db.findBookByName(bookName1);
   }
 
-  private void doTransaction_FindBooksByGenre(OnlineShopDB db) {
+  private void doTransaction_FindBooksByGenre(onlineShopDB db) {
     String genre = genres.nextValue();
     db.findBooksByGenre(genre, 5);
   }
 
-  private void doTransaction_UpdateBook(OnlineShopDB db) {
+  private void doTransaction_UpdateBook(onlineShopDB db) {
     int bookID = nextKeynum(bookIDchooser, transactioninsertkeysequenceBook.lastValue().intValue());
     String intro = text.nextValue();
     String title = buildKeyName("book", bookID);
@@ -531,7 +531,7 @@ public class OnlineShopWorkload extends Workload {
     db.updateBook(bookID, title, lang, intro);
   }
 
-  private void doTransaction_UpdateAuthor(OnlineShopDB db) {
+  private void doTransaction_UpdateAuthor(onlineShopDB db) {
     int authorID = nextKeynum(authorIDchooser, transactioninsertkeysequenceAuthor.lastValue().intValue());
     String resume = text.nextValue();
     String authorName = buildKeyName("author", authorID);
@@ -541,7 +541,7 @@ public class OnlineShopWorkload extends Workload {
     db.updateAuthor(authorID, authorName, sex, bDay, resume);
   }
 
-  private void doTransaction_UpdateRecommendation(OnlineShopDB db) {
+  private void doTransaction_UpdateRecommendation(onlineShopDB db) {
     int bookID = nextKeynum(bookIDchooser, transactioninsertkeysequenceBook.lastValue().intValue());
     int userID = nextKeynum(userIDchooser, transactioninsertkeysequenceUser.lastValue().intValue());
     String textNew = text.nextValue();
@@ -551,20 +551,20 @@ public class OnlineShopWorkload extends Workload {
     db.updateRecommendation(bookID, userID, stars, textNew);
   }
 
-  private void doTransaction_DeleteBook(OnlineShopDB db) {
+  private void doTransaction_DeleteBook(onlineShopDB db) {
     int bookID = nextKeynum(bookIDchooser, transactioninsertkeysequenceBook.lastValue().intValue());
 
     db.deleteBook(bookID);
 
   }
 
-  private void doTransaction_DeleteAllRecommendationsBelongToBook(OnlineShopDB db) {
+  private void doTransaction_DeleteAllRecommendationsBelongToBook(onlineShopDB db) {
     int bookID = nextKeynum(bookIDchooser, transactioninsertkeysequenceBook.lastValue().intValue());
 
     db.deleteAllRecommendationsBelongToBook(bookID);
   }
 
-  private void doTransaction_DeleteAuthor(OnlineShopDB db) {
+  private void doTransaction_DeleteAuthor(onlineShopDB db) {
     int authorID = nextKeynum(authorIDchooser, transactioninsertkeysequenceAuthor.lastValue().intValue());
 
     db.deleteAuthor(authorID);

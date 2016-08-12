@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-public abstract class OnlineShopDB extends DB {
+public abstract class onlineShopDB extends DB {
 
 
 
@@ -43,25 +43,25 @@ public abstract class OnlineShopDB extends DB {
   public abstract Status insertRecommendation(int bookID, int userID, int stars, int likes, String text, Date createTime);
 
 
-  public abstract Status getLatestRecommendations(int bookID, int limit);
+  public abstract Recommendation getLatestRecommendations(int bookID, int limit);
 
 
   public abstract Recommendation getAllRecommendations(int bookID);
 
 
-  public abstract Status getUsersRecommendations(int userID);
+  public abstract Recommendation getUsersRecommendations(int userID);
 
 
-  public abstract Status getAuthorByID(int authorID);
+  public abstract Author getAuthorByID(int authorID);
 
 
-  public abstract Status findBooksByGenre(String genreList, int limit);
+  public abstract Book findBooksByGenre(String genreList, int limit);
 
 
-  public abstract Status findBooksName(String bookName, int limit);
+  public abstract Book findBookByName(String bookName);
 
 
-  public abstract Status findAuthorByBookID(int bookID);
+  public abstract Author findAuthorByBookID(int bookID);
 
 
   public abstract Status updateBook(int bookID, String title, String language, String introduction);
