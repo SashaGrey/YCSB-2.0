@@ -37,7 +37,7 @@ public class onlineShopDBClientSpecializedQueries extends onlineShopDBClient {
     return Status.OK;
   }
 
-  *//**
+  *//**b
    * db.books.ensureIndex({introduction:"text"})
    * db.books.find({$text:{$search:searchText}})
    *//*
