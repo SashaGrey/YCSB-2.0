@@ -48,16 +48,11 @@ public class onlineShopDBClientSpecializedQueries extends onlineShopDBClient {
     return Status.OK;
   }
 
+}
 
-  *//**
-   * db.authors.find({fullName: authorName,booksPublished:{$exists:true},booksPublished: {$size:{$gt:3}}})
-   *//*
-  public Status findHDAuthor(String authorName, int bookWritten) {
-    FindIterable<Document> results = database.getCollection("authors")
-      .find(new Document("fullName", authorName)
-        .append("booksPublished", new Document("$exists", true))
-        .append("booksPublished", new Document("$size", new Document("$gt", 3))));
 
-    return Status.OK;
-  }*/
+
+   //db.recommendations.aggregate([{"$match":{"_id": 16 }},{"$unwind": "$recommendations"},{"$match": {"recommendations._id": 393}},{"$project": {"_id":0,"recommendations":1}},{"$limit": 20}])
+
+**/
 }

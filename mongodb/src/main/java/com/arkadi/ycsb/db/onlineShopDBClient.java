@@ -4,10 +4,12 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.ReadPreference;
 import com.mongodb.WriteConcern;
+import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.InsertManyOptions;
-import com.mongodb.client.result.UpdateResult;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 import com.yahoo.ycsb.ByteIterator;
 import com.yahoo.ycsb.workloads.onlineshop.Author;
 import com.yahoo.ycsb.workloads.onlineshop.Book;
@@ -15,7 +17,6 @@ import com.yahoo.ycsb.workloads.onlineshop.Recommendation;
 import com.yahoo.ycsb.Status;
 import com.yahoo.ycsb.db.OptionsSupport;
 import com.yahoo.ycsb.workloads.onlineshop.onlineShopDB;
-import org.bson.Document;
 import com.mongodb.client.FindIterable;
 import com.mongodb.Block;
 
@@ -26,18 +27,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class onlineShopDBClient extends onlineShopDB {
 
 
-  private static final Integer INCLUDE = 1;
-  private static final InsertManyOptions INSERT_UNORDERED = new InsertManyOptions().ordered(false);
-  private static final AtomicInteger INIT_COUNT = new AtomicInteger(0);
-  private static String databaseName;
-  private static MongoDatabase database;
-  private static MongoClient mongoClient;
-  private static ReadPreference readPreference;
-  private static WriteConcern writeConcern;
-  private static int batchSize;
-  private static boolean useUpsert;
-  private List<Document> BULKINSERT_B = new ArrayList<>();
-  private List<Document> BULKINSERT_A = new ArrayList<>();
+   static final Integer INCLUDE = 1;
+   static final InsertManyOptions INSERT_UNORDERED = new InsertManyOptions().ordered(false);
+   static final AtomicInteger INIT_COUNT = new AtomicInteger(0);
+   static String databaseName;
+   static MongoDatabase database;
+   static MongoClient mongoClient;
+   static ReadPreference readPreference;
+   static WriteConcern writeConcern;
+   static int batchSize;
+   static boolean useUpsert;
+   List<Document> BULKINSERT_B = new ArrayList<>();
+   List<Document> BULKINSERT_A = new ArrayList<>();
 
 
   public void init() {
@@ -243,6 +244,7 @@ public class onlineShopDBClient extends onlineShopDB {
 
   /**
    * db.recommendations.find({"_id":recommendationBundleID}).sort({"recommendations._id",-1}).limit(amount)
+   * find a special amount of  latest recommendations recommendations and calculate the average user rating
    */
   @Override
   public Recommendation getLatestRecommendations(int bookID, int limit) {
@@ -311,23 +313,29 @@ public class onlineShopDBClient extends onlineShopDB {
 
 
   /**
-   * db.users.find({_id: userID},{booksRecommended: 1})
+   * db.recommendations.aggregate([{"$match":{"_id": bookID }},{"$unwind": "$recommendations"},{"$match": {"recommendations._id": userID,{"$project": {"_id":0,"recommendations":1}},{"$limit": 20}])
    */
   @Override
   public Recommendation getUsersRecommendations(int userID) {
     Document query = new Document("_id", userID);
     Document booksID = database.getCollection("users").find(query).first();
     int[] booksIDs = (int[]) booksID.get("booksRecommended");
-    final List<Document> userRecommends = new LinkedList<>();
+    final List<AggregateIterable<Document>> userRecommends = new LinkedList<>();
 
     // mindestens ein buch wurde kommentiert
     Recommendation rec = new Recommendation(Status.OK.getName(), Status.OK.getDescription(), booksIDs[0],1);
 
     if (booksIDs.length != 0) {
       for (int book : booksIDs) {
-        userRecommends.add(database.getCollection("recommendations").find(new Document("_id", book).append("recommends.userID", userID)).first());
-      }
+        Bson querryBook = new Document("$match", book);
+        Bson unwind = new Document("$unwind", "$recommendations");
+        Bson querryRecommend = new Document("$match", new Document("recommendations._id", userID));
+        Bson project = new Document("_id", 0).append("recommendations", 1);
+        Bson[] array = {querryBook, unwind, querryRecommend, project};
 
+
+        userRecommends.add(database.getCollection("recommendations").aggregate(new ArrayList<>(Arrays.asList(array))));
+      }
 
       return rec;
     }
@@ -382,13 +390,12 @@ public class onlineShopDBClient extends onlineShopDB {
   }
 
   /**
-   * db.recommendations.updateOne({_id: recommendationBundleID,"recommendations._id": userID},
-   * {$set: {"recommendations.stars": stars,"recommendations.text":text}}
+   * db.recommendations.updateOne({_id: 19,"recommendations._id": 312},{$set: {"recommendations.0.stars": 1,"recommendations.0.text":"hallo"}})
    */
   @Override
   public Status updateRecommendation(int bookID, int userID, int stars, String text) {
     Document query = new Document("_id", bookID).append("recommendations._id", userID);
-    Document update = new Document("recommendations.stars", stars).append("recommendations.text", text);
+    Document update = new Document("recommendations.0.stars", stars).append("recommendations.0.text", text);
     database.getCollection("recommendations").updateOne(query, (new Document("$set", update)));
     //database.getCollection("recommendations").updateOne(query, (new Document("$set", new Document("recommendations.text", text))));
 
@@ -471,7 +478,6 @@ public class onlineShopDBClient extends onlineShopDB {
 
     return Status.OK;
   }
-
 
 
   /*----------------------------------------------Deprecated operations-----------------------------------------------*/

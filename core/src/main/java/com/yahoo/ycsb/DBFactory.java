@@ -44,7 +44,7 @@ import org.apache.htrace.core.Tracer;
     }
 
     ret.setProperties(properties);
-    if (dbname.contains("OnlineShopDBClient")) {
+    if (dbname.contains("onlineShopDBClient")||dbname.contains("onlineShopDBClientAlternativeSchema")) {
       return new onlineShopDBWrapper ((onlineShopDB) ret, tracer);
     } else {
       return new DBWrapper(ret, tracer);

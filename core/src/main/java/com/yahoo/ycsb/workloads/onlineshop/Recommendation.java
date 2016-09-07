@@ -9,6 +9,7 @@ public class Recommendation extends Status {
   private String bookTitle;
   private int  count;
   private int bookID;
+  private int userID;
 
   //object constructor
   public Recommendation(String name, String description, int stars,String bookTitle) {
@@ -27,6 +28,12 @@ public class Recommendation extends Status {
     super(name, description);
     this.bookID = bookID;
     this.stars = stars;
+  }
+
+  //get all user recommendation
+  public Recommendation(String name, String description, int belongToUserID) {
+    super(name, description);
+    this.userID = belongToUserID;
   }
 
 
